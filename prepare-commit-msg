@@ -1,0 +1,12 @@
+#!/bin/sh
+
+# Capture any number on the branch name and assume that its a ticket number.
+# This number is added to the commit message iff the message does not already contain a ticket reference.
+# If the branch does not contain any numbers, the commit message is left unalterd.
+
+grep -q -E "(ticket:|#)[0-9]+" "$1" || {
+    TICKET=$(git symbolic-ref HEAD | sed 's/[^0-9]*\([0-9]*\)[^0-9]*/\1/')
+    if [ -n "$TICKET" ] ; then
+        echo "Towards #${TICKET}" >> "$1"
+    fi
+}
